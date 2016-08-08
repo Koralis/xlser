@@ -10,6 +10,11 @@ class Xlser extends PHPExcel
 {
     const OUTPUT_MEMORY = 1;
 
+    const STYLE_BOLD = 1;
+
+    protected $currentRow = 1;
+    protected $currentCol = 0;
+
     /** @var ReflectionObject */
     protected $refl;
 
@@ -45,25 +50,33 @@ class Xlser extends PHPExcel
         throw new \Exception("This class doesn't accept dynamic properties");
     }
 
-    public function setData($data, $headers = [])
+    public function setData(array $data, $headers = [])
     {
         $this->data = $data;
         $this->headers = $headers;
 
-        $row = 1;
-        $col = 0;
+        $sheet = $this->getActiveSheet();
+
+        $this->_resetCursor();
+
         foreach ($headers as $header) {
-            $this->getActiveSheet()->setCellValueByColumnAndRow($col++, $row, $header);
+            $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $header);
+            $this->_advanceCol();
         }
 
+        $this->_advanceRow();
 
         foreach ($data as $rowData) {
-            $row++;
-            $col = 0;
+            $this->_resetCol();
             foreach ($rowData as $columnData) {
-                $this->getActiveSheet()->setCellValueByColumnAndRow($col++, $row, $columnData);
+                $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $columnData);
+                $this->_advanceCol();
             }
+
+            $this->_advanceRow();
         }
+
+        return $this;
     }
 
     public function output($type)
@@ -83,6 +96,59 @@ class Xlser extends PHPExcel
             default:
                 throw new \Exception('Unknown output type');
         }
+    }
+
+    public function appendRow(array $rowData)
+    {
+    }
+
+    private function _resetCursor()
+    {
+        $this->_resetRow();
+        $this->_resetCol();
+    }
+
+    private function _resetCol()
+    {
+        $this->currentCol = 0;
+    }
+
+    private function _resetRow()
+    {
+        $this->currentRow = 1;
+    }
+
+    /**
+     * Advances the row cursor position and returns the last position
+     *
+     * @return int
+     */
+    private function _advanceRow()
+    {
+        return $this->currentRow++;
+    }
+
+    /**
+     * Advances the colum cursor position and returns the last position
+     *
+     * @return int
+     */
+    private function _advanceCol()
+    {
+        return $this->currentCol++;
+    }
+
+    /**
+     * @return int
+     */
+    private function _getCurrentRow()
+    {
+        return $this->currentRow;
+    }
+
+    private function _getCurrentCol()
+    {
+        return $this->currentCol;
     }
 
 }

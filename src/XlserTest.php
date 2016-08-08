@@ -54,11 +54,12 @@ class XlserTest extends \PHPUnit_Framework_TestCase
 
     private function setData()
     {
+        $headers = ['header1', 'header2'];
+
         $data = [
-            ['1 1st', '1 2nd'],
-            ['2 1st', '2 2nd'],
+            ['row2 col1', 'row2 col2'],
+            ['row3 col1', 'row3 col2'],
         ];
-        $headers = ['1st col', '2nd col'];
 
         $this->man->setData($data, $headers);
     }
@@ -69,11 +70,19 @@ class XlserTest extends \PHPUnit_Framework_TestCase
 
         $sheet = $this->man->getActiveSheet();
 
-        self::assertEquals('1st col', $sheet->getCell('A1')->getValue());
-        self::assertEquals('2nd col', $sheet->getCell('B1')->getValue());
-        self::assertEquals('1 1st', $sheet->getCell('A2')->getValue());
-        self::assertEquals('1 2nd', $sheet->getCell('B2')->getValue());
-        self::assertEquals('2 1st', $sheet->getCell('A3')->getValue());
-        self::assertEquals('2 2nd', $sheet->getCell('B3')->getValue());
+        self::assertEquals('header1', $sheet->getCell('A1')->getValue());
+        self::assertEquals('header2', $sheet->getCell('B1')->getValue());
+        self::assertEquals('row2 col1', $sheet->getCell('A2')->getValue());
+        self::assertEquals('row2 col2', $sheet->getCell('B2')->getValue());
+        self::assertEquals('row3 col1', $sheet->getCell('A3')->getValue());
+        self::assertEquals('row3 col2', $sheet->getCell('B3')->getValue());
     }
+
+    public function test_if_it_appends_a_row()
+    {
+        $this->man->appendRow(['header1', 'header2']);
+
+
+    }
+
 }
