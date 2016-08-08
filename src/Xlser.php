@@ -68,7 +68,16 @@ class Xlser extends PHPExcel
 
         foreach ($rowData as $val) {
             /** @var PHPExcel_Cell $cell */
-            $cell = $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $val, true);
+            if (is_scalar($val)) {
+                $cell = $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $val, true);
+            } elseif (is_array($val) && isset($val[1]) && is_callable($val[1])) {
+                $cell = $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $val[0], true);
+                $val[1]($cell);
+            } elseif (is_callable($val)) {
+                $cell = $sheet->getCellByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow());
+                $val($cell);
+            }
+
 
             if ($flags) {
                 switch (true) {
@@ -110,23 +119,27 @@ class Xlser extends PHPExcel
     }
 
     /**
-     * Advances the row cursor position and returns the last position
+     * Advances the row cursor position
      *
-     * @return int
+     * @return self
      */
     private function _advanceRow()
     {
-        return $this->currentRow++;
+        $this->currentRow++;
+
+        return $this;
     }
 
     /**
-     * Advances the colum cursor position and returns the last position
+     * Advances the colum cursor position
      *
-     * @return int
+     * @return self
      */
     private function _advanceCol()
     {
-        return $this->currentCol++;
+        $this->currentCol++;
+
+        return $this;
     }
 
     /**
@@ -140,6 +153,26 @@ class Xlser extends PHPExcel
     private function _getCurrentCol()
     {
         return $this->currentCol;
+    }
+
+    public function getRow()
+    {
+        return $this->_getCurrentRow();
+    }
+
+    public function getCol()
+    {
+        return $this->_getCurrentCol();
+    }
+
+    public function newRow()
+    {
+        return $this->_advanceRow();
+    }
+
+    public function newCol()
+    {
+        return $this->_advanceCol();
     }
 
 }

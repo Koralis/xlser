@@ -80,5 +80,57 @@ class XlserTest extends \PHPUnit_Framework_TestCase
         $this->man->appendRow(['data1', 'data2']);
         self::assertEquals('data1', $this->sheet->getCell('A2')->getValue());
         self::assertEquals('data2', $this->sheet->getCell('B2')->getValue());
+
+        $val = 10;
+        $this->man->appendRow([
+            0,
+            [0, function (\PHPExcel_Cell $c) use ($val) {
+                $c->getStyle()->getFont()->setBold(true);
+                $c->setValue($val);
+            }]
+        ]);
+        self::assertEquals('0', $this->sheet->getCell('A3')->getValue());
+        self::assertEquals('10', $this->sheet->getCell('B3')->getValue());
+        self::assertEquals(true, $this->sheet->getCell('B3')->getStyle()->getFont()->getBold());
+
+        $this->man->appendRow([
+            function (\PHPExcel_Cell $c) use ($val) {
+                $c->setValue('test');
+            }
+        ]);
+
+        self::assertEquals('test', $this->sheet->getCell('A4')->getValue());
+    }
+
+    public function test_if_it_gets_the_row_and_col_props()
+    {
+        $this->man->getRow();
+        $this->man->getCol();
+    }
+
+    public function test_if_it_moves_to_another_row()
+    {
+        $row = $this->man->getRow();
+
+        $this->man
+            ->newRow()
+            ->newRow();
+
+        $newRow = $this->man->getRow();
+
+        self::assertEquals($row + 2, $newRow);
+    }
+
+    public function test_if_it_moves_to_another_col()
+    {
+        $col = $this->man->getCol();
+
+        $this->man
+            ->newCol()
+            ->newCol();
+
+        $newCol = $this->man->getCol();
+
+        self::assertEquals($col + 2, $newCol);
     }
 }
