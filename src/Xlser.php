@@ -3,8 +3,8 @@
 namespace Sakalys\Xlser;
 
 use PHPExcel;
+use PHPExcel_Cell;
 use ReflectionObject;
-use ReflectionProperty;
 
 class Xlser extends PHPExcel
 {
@@ -18,12 +18,6 @@ class Xlser extends PHPExcel
     /** @var ReflectionObject */
     protected $refl;
 
-    /** @var [] */
-    protected $data;
-
-    /** @var [] */
-    protected $headers;
-
     public function __construct()
     {
         parent::__construct();
@@ -36,44 +30,14 @@ class Xlser extends PHPExcel
         return new XlsWriter($this);
     }
 
-    public function __set($name, $value)
-    {
-        $props = $this->refl->getProperties(ReflectionProperty::IS_PUBLIC);
-
-        foreach ($props as $prop) {
-            if ($prop->getName() == $name) {
-                $this->{$name} = $value;
-                return;
-            }
-        }
-
-        throw new \Exception("This class doesn't accept dynamic properties");
-    }
-
     public function setData(array $data, $headers = [])
     {
-        $this->data = $data;
-        $this->headers = $headers;
-
-        $sheet = $this->getActiveSheet();
-
         $this->_resetCursor();
 
-        foreach ($headers as $header) {
-            $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $header);
-            $this->_advanceCol();
-        }
-
-        $this->_advanceRow();
+        $this->appendRow($headers);
 
         foreach ($data as $rowData) {
-            $this->_resetCol();
-            foreach ($rowData as $columnData) {
-                $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $columnData);
-                $this->_advanceCol();
-            }
-
-            $this->_advanceRow();
+            $this->appendRow($rowData);
         }
 
         return $this;
@@ -98,8 +62,35 @@ class Xlser extends PHPExcel
         }
     }
 
-    public function appendRow(array $rowData)
+    public function appendRow(array $rowData, $flags = 0)
     {
+        $sheet = $this->getActiveSheet();
+
+        foreach ($rowData as $val) {
+            /** @var PHPExcel_Cell $cell */
+            $cell = $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $val, true);
+
+            if ($flags) {
+                switch (true) {
+                    case $flags & self::STYLE_BOLD:
+                        $cell->getStyle()->getFont()->setBold(true);
+                    default:
+                        break;
+                }
+            }
+
+            $this->_advanceCol();
+        }
+
+        $this->_resetCol();
+        $this->_advanceRow();
+    }
+
+    public function appendHeaderRow(array $data)
+    {
+        $this->appendRow($data, self::STYLE_BOLD);
+
+        return $this;
     }
 
     private function _resetCursor()

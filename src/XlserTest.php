@@ -2,14 +2,20 @@
 
 namespace Sakalys\Xlser;
 
+use PHPExcel_Worksheet;
+
 class XlserTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Xlser */
     protected $man;
 
+    /** @var PHPExcel_Worksheet */
+    protected $sheet;
+
     public function setUp()
     {
         $this->man = new Xlser;
+        $this->sheet = $this->man->getActiveSheet();
     }
 
     public function test_if_it_is_instantiable()
@@ -22,19 +28,6 @@ class XlserTest extends \PHPUnit_Framework_TestCase
         $writer = $this->createWriter();
 
         self::assertTrue(!!$writer);
-    }
-
-    public function test_if_it_does_not_accept_dynamic_properties()
-    {
-        $caught = false;
-        try {
-            $this->man->testprop_that_does_not_exist = null;
-            echo 1234;
-        } catch (\Exception $e) {
-            $caught = true;
-        }
-
-        self::assertTrue($caught, "It should not be allowed to set non-existing properties");
     }
 
     public function test_if_it_accepts_data_and_headers()
@@ -80,9 +73,12 @@ class XlserTest extends \PHPUnit_Framework_TestCase
 
     public function test_if_it_appends_a_row()
     {
-        $this->man->appendRow(['header1', 'header2']);
+        $this->man->appendHeaderRow(['header1', 'header2']);
+        self::assertEquals('header1', $this->sheet->getCell('A1')->getValue());
+        self::assertEquals('header2', $this->sheet->getCell('B1')->getValue());
 
-
+        $this->man->appendRow(['data1', 'data2']);
+        self::assertEquals('data1', $this->sheet->getCell('A2')->getValue());
+        self::assertEquals('data2', $this->sheet->getCell('B2')->getValue());
     }
-
 }
