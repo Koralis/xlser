@@ -1,21 +1,27 @@
 {
-    "name": "sakalys/xlser",
-    "require": {
-        "phpoffice/phpexcel": "^1.8"
+  "name": "sakalys/xlser",
+  "description": "A wrapper that simplifies work with phpoffice/phpexcel library",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": ">=5.6",
+    "phpoffice/phpexcel": "^1.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Sakalys\\Xlser\\": "src"
     },
-    "autoload": {
-        "psr-4": {
-            "Sakalys\\Xlser\\": "src"
-        },
-        "exclude-from-classmap": ["**Test.php"]
-    },
-    "authors": [
-        {
-            "name": "Julius Šakalys",
-            "email": "julius.sakalys@gmail.com"
-        }
-    ],
-    "require-dev": {
-        "phpunit/phpunit": "^5.5"
+    "exclude-from-classmap": [
+      "**Test.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Julius Šakalys",
+      "email": "julius.sakalys@gmail.com"
     }
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "^5.5"
+  }
 }
