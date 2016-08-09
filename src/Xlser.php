@@ -12,6 +12,10 @@ class Xlser extends PHPExcel
 
     const STYLE_BOLD = 1;
 
+    const ALIGN_LEFT = 2;
+    const ALIGN_RIGHT = 4;
+    const ALIGN_CENTER = 8;
+
     protected $currentRow = 1;
     protected $currentCol = 0;
 

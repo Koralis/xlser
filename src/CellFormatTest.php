@@ -26,7 +26,8 @@ class CellFormatTest extends \PHPUnit_Framework_TestCase
     {
         $man = new Xlser();
         $sheet = $man->getActiveSheet();
-        $cell = new \PHPExcel_Cell('', null, $sheet);
+
+        $cell = $sheet->setCellValue('A1', 123, true);
 
         $cellFormat = new CellFormat();
         $cellFormat->apply($cell);
