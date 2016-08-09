@@ -9,7 +9,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Sakalys\\Xlser\\": "src"
+      "Koralis\\Xlser\\": "src"
     }
   },
   "authors": [

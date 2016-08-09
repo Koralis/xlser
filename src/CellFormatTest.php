@@ -1,6 +1,6 @@
 <?php
 
-namespace Sakalys\Xlser;
+namespace Koralis\Xlser;
 
 class CellFormatTest extends \PHPUnit_Framework_TestCase
 {

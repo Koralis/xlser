@@ -1,6 +1,6 @@
 <?php
 
-namespace Sakalys\Xlser;
+namespace Koralis\Xlser;
 
 use PHPExcel_Cell;
 
