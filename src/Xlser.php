@@ -63,20 +63,28 @@ class Xlser extends PHPExcel
     public function appendRow(array $rowData, CellFormat $rowFormat = null)
     {
         foreach ($rowData as $val) {
-            $format = null;
+            $cellFormat = null;
             if (is_array($val)) {
                 if (isset($val[1]) && $val[1]) {
-                    $format = $val[1];
-                    if (is_scalar($format)) {
-                        $format = CellFormat::createFromScalar($format);
+                    $cellFormat = $val[1];
+                    if (is_scalar($cellFormat)) {
+                        $cellFormat = CellFormat::createFromScalar($cellFormat);
                     }
                 }
+
+
                 if (isset($val[0])) {
                     $val = $val[0];
                 }
             }
 
-            $this->insertVal($val, $format, $rowFormat);
+            if ($rowFormat) {
+                if (is_scalar($rowFormat)) {
+                    $rowFormat = CellFormat::createFromScalar($rowFormat);
+                }
+            }
+
+            $this->insertVal($val, $cellFormat, $rowFormat);
         }
 
         $this->_resetCol();
