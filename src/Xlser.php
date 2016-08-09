@@ -15,15 +15,18 @@ class Xlser extends PHPExcel
     protected $currentRow = 1;
     protected $currentCol = 0;
 
-    /** @var ReflectionObject */
-    protected $refl;
+    /** @var bool */
+    protected $autoColWidth;
 
     public function __construct()
     {
         parent::__construct();
-        $this->refl = new ReflectionObject($this);
     }
 
+    public static function formatCurrency($symbol, $precision, $symbolAfterValue = false, $thousandSeparator = ',', $decimalSeparator = '.')
+    {
+        return new CellFormat($symbol, $precision, $symbolAfterValue, $thousandSeparator, $decimalSeparator);
+    }
 
     public function createWriter()
     {
@@ -62,33 +65,23 @@ class Xlser extends PHPExcel
         }
     }
 
-    public function appendRow(array $rowData, $flags = 0)
+    public function appendRow(array $rowData)
     {
-        $sheet = $this->getActiveSheet();
-
         foreach ($rowData as $val) {
-            /** @var PHPExcel_Cell $cell */
-            if (is_scalar($val)) {
-                $cell = $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $val, true);
-            } elseif (is_array($val) && isset($val[1]) && is_callable($val[1])) {
-                $cell = $sheet->setCellValueByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow(), $val[0], true);
-                $val[1]($cell);
-            } elseif (is_callable($val)) {
-                $cell = $sheet->getCellByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow());
-                $val($cell);
-            }
-
-
-            if ($flags) {
-                switch (true) {
-                    case $flags & self::STYLE_BOLD:
-                        $cell->getStyle()->getFont()->setBold(true);
-                    default:
-                        break;
+            $format = null;
+            if (is_array($val)) {
+                if (isset($val[1]) && $val[1]) {
+                    $format = $val[1];
+                    if (is_scalar($format)) {
+                        $format = CellFormat::createFromScalar($format);
+                    }
+                }
+                if (isset($val[0])) {
+                    $val = $val[0];
                 }
             }
 
-            $this->_advanceCol();
+            $this->appendCell($val, $format);
         }
 
         $this->_resetCol();
@@ -97,7 +90,7 @@ class Xlser extends PHPExcel
 
     public function appendHeaderRow(array $data)
     {
-        $this->appendRow($data, self::STYLE_BOLD);
+        $this->appendRow($data);
 
         return $this;
     }
@@ -173,6 +166,35 @@ class Xlser extends PHPExcel
     public function newCol()
     {
         return $this->_advanceCol();
+    }
+
+    /**
+     * @param $value
+     * @param $format
+     *
+     * @throws \PHPExcel_Exception
+     */
+    public function appendCell($value, CellFormat $format = null)
+    {
+        $sheet = $this->getActiveSheet();
+        $cell = $sheet->getCellByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow());
+
+        if (is_callable($value)) {
+            $value = $value($cell);
+        }
+
+        $cell->setValue($value);
+
+        if ($format) {
+            $format->apply($cell);
+        }
+
+        $this->_advanceCol();
+    }
+
+    public function autoColWidth($bool)
+    {
+        $this->autoColWidth = $bool;
     }
 
 }

@@ -2,6 +2,7 @@
 
 namespace Sakalys\Xlser;
 
+use PHPExcel_Cell;
 use PHPExcel_Worksheet;
 
 class XlserTest extends \PHPUnit_Framework_TestCase
@@ -81,21 +82,19 @@ class XlserTest extends \PHPUnit_Framework_TestCase
         self::assertEquals('data1', $this->sheet->getCell('A2')->getValue());
         self::assertEquals('data2', $this->sheet->getCell('B2')->getValue());
 
-        $val = 10;
-        $this->man->appendRow([
-            0,
-            [0, function (\PHPExcel_Cell $c) use ($val) {
-                $c->getStyle()->getFont()->setBold(true);
-                $c->setValue($val);
-            }]
-        ]);
-        self::assertEquals('0', $this->sheet->getCell('A3')->getValue());
-        self::assertEquals('10', $this->sheet->getCell('B3')->getValue());
-        self::assertEquals(true, $this->sheet->getCell('B3')->getStyle()->getFont()->getBold());
+        $boldFormat = new CellFormat();
+        $boldFormat->setBold(true);
 
         $this->man->appendRow([
-            function (\PHPExcel_Cell $c) use ($val) {
-                $c->setValue('test');
+            [10, $boldFormat],
+        ]);
+
+        self::assertEquals('10', $this->sheet->getCell('A3')->getValue());
+        self::assertEquals(true, $this->sheet->getCell('A3')->getStyle()->getFont()->getBold());
+
+        $this->man->appendRow([
+            function (PHPExcel_Cell $c) { // The cell must be passed
+                return 'test';
             }
         ]);
 
@@ -132,5 +131,15 @@ class XlserTest extends \PHPUnit_Framework_TestCase
         $newCol = $this->man->getCol();
 
         self::assertEquals($col + 2, $newCol);
+    }
+
+    public function test_if_auto_column_width_can_be_set()
+    {
+        $this->man->autoColWidth(true);
+    }
+
+    public function test_if_it_is_possible_to_add_a_formatted_cell()
+    {
+        $this->man->appendCell(123, new CellFormat());
     }
 }
