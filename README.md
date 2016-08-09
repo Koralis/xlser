@@ -9,4 +9,4 @@ Installation is done through composer
 ## Usage
 
     $xls = new Xlser();
-    
+
