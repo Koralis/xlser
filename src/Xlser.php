@@ -28,11 +28,6 @@ class Xlser extends PHPExcel
         return new CellFormat($symbol, $precision, $symbolAfterValue, $thousandSeparator, $decimalSeparator);
     }
 
-    public function createWriter()
-    {
-        return new XlsWriter($this);
-    }
-
     public function setData(array $data, $headers = [])
     {
         $this->_resetCursor();
@@ -65,23 +60,31 @@ class Xlser extends PHPExcel
         }
     }
 
-    public function appendRow(array $rowData)
+    public function appendRow(array $rowData, CellFormat $rowFormat = null)
     {
         foreach ($rowData as $val) {
-            $format = null;
+            $cellFormat = null;
             if (is_array($val)) {
                 if (isset($val[1]) && $val[1]) {
-                    $format = $val[1];
-                    if (is_scalar($format)) {
-                        $format = CellFormat::createFromScalar($format);
+                    $cellFormat = $val[1];
+                    if (is_scalar($cellFormat)) {
+                        $cellFormat = CellFormat::createFromScalar($cellFormat);
                     }
                 }
+
+
                 if (isset($val[0])) {
                     $val = $val[0];
                 }
             }
 
-            $this->appendCell($val, $format);
+            if ($rowFormat) {
+                if (is_scalar($rowFormat)) {
+                    $rowFormat = CellFormat::createFromScalar($rowFormat);
+                }
+            }
+
+            $this->insertVal($val, $cellFormat, $rowFormat);
         }
 
         $this->_resetCol();
@@ -90,7 +93,9 @@ class Xlser extends PHPExcel
 
     public function appendHeaderRow(array $data)
     {
-        $this->appendRow($data);
+        $rowFormat = new CellFormat();
+        $rowFormat->setBold(true);
+        $this->appendRow($data, $rowFormat);
 
         return $this;
     }
@@ -170,11 +175,12 @@ class Xlser extends PHPExcel
 
     /**
      * @param $value
-     * @param $format
-     *
+     * @param CellFormat $cellFormat
+     * @param CellFormat $rowFormat
+     * @return PHPExcel_Cell
      * @throws \PHPExcel_Exception
      */
-    public function appendCell($value, CellFormat $format = null)
+    public function insertVal($value, CellFormat $cellFormat = null, CellFormat $rowFormat = null)
     {
         $sheet = $this->getActiveSheet();
         $cell = $sheet->getCellByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow());
@@ -185,11 +191,17 @@ class Xlser extends PHPExcel
 
         $cell->setValue($value);
 
-        if ($format) {
-            $format->apply($cell);
+        if ($rowFormat) {
+            $rowFormat->apply($cell);
+        }
+
+        if ($cellFormat) {
+            $cellFormat->apply($cell);
         }
 
         $this->_advanceCol();
+
+        return $cell;
     }
 
     public function autoColWidth($bool)

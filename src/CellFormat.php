@@ -37,8 +37,9 @@ class CellFormat
      * @param string $decimalSeparator
      * @return CellFormat
      */
-    public static function currency($symbol, $precision = 2, $symbolAfterValue = false, $thousandSeparator = ',', $decimalSeparator = '.')
+/*    public static function currency($symbol, $precision = 2, $symbolAfterValue = false, $thousandSeparator = ',', $decimalSeparator = '.')
     {
+        // This line here
 //        $o = new self;
 //
 ////        $numberFormat = '"$"#,##0.00_-';
@@ -61,7 +62,7 @@ class CellFormat
 
 
         return $o;
-    }
+    }*/
 
     /**
      * @param string $string
@@ -73,7 +74,7 @@ class CellFormat
 
         if (is_integer($string)) {
             switch (true) {
-                case $format & Xlser::STYLE_BOLD:
+                case $string & Xlser::STYLE_BOLD:
                     $format->setBold(true);
                     break;
                 default:

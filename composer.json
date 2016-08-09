@@ -10,10 +10,7 @@
   "autoload": {
     "psr-4": {
       "Sakalys\\Xlser\\": "src"
-    },
-    "exclude-from-classmap": [
-      "**Test.php"
-    ]
+    }
   },
   "authors": [
     {

@@ -15,4 +15,17 @@
             <directory suffix="Test.php">./src</directory>
         </testsuite>
     </testsuites>
+
+    <logging>
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="true"/>
+    </logging>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src</directory>
+            <exclude>
+                <directory suffix="Test.php">.</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>
