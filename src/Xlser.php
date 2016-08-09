@@ -28,11 +28,6 @@ class Xlser extends PHPExcel
         return new CellFormat($symbol, $precision, $symbolAfterValue, $thousandSeparator, $decimalSeparator);
     }
 
-    public function createWriter()
-    {
-        return new XlsWriter($this);
-    }
-
     public function setData(array $data, $headers = [])
     {
         $this->_resetCursor();
@@ -65,7 +60,7 @@ class Xlser extends PHPExcel
         }
     }
 
-    public function appendRow(array $rowData)
+    public function appendRow(array $rowData, CellFormat $rowFormat = null)
     {
         foreach ($rowData as $val) {
             $format = null;
@@ -81,7 +76,7 @@ class Xlser extends PHPExcel
                 }
             }
 
-            $this->appendCell($val, $format);
+            $this->insertVal($val, $format, $rowFormat);
         }
 
         $this->_resetCol();
@@ -90,7 +85,9 @@ class Xlser extends PHPExcel
 
     public function appendHeaderRow(array $data)
     {
-        $this->appendRow($data);
+        $rowFormat = new CellFormat();
+        $rowFormat->setBold(true);
+        $this->appendRow($data, $rowFormat);
 
         return $this;
     }
@@ -170,11 +167,12 @@ class Xlser extends PHPExcel
 
     /**
      * @param $value
-     * @param $format
-     *
+     * @param CellFormat $cellFormat
+     * @param CellFormat $rowFormat
+     * @return PHPExcel_Cell
      * @throws \PHPExcel_Exception
      */
-    public function appendCell($value, CellFormat $format = null)
+    public function insertVal($value, CellFormat $cellFormat = null, CellFormat $rowFormat = null)
     {
         $sheet = $this->getActiveSheet();
         $cell = $sheet->getCellByColumnAndRow($this->_getCurrentCol(), $this->_getCurrentRow());
@@ -185,11 +183,17 @@ class Xlser extends PHPExcel
 
         $cell->setValue($value);
 
-        if ($format) {
-            $format->apply($cell);
+        if ($rowFormat) {
+            $rowFormat->apply($cell);
+        }
+
+        if ($cellFormat) {
+            $cellFormat->apply($cell);
         }
 
         $this->_advanceCol();
+
+        return $cell;
     }
 
     public function autoColWidth($bool)
