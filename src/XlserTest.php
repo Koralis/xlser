@@ -65,12 +65,10 @@ class XlserTest extends \PHPUnit_Framework_TestCase
     public function test_if_it_appends_a_header_row()
     {
         $this->man->appendHeaderRow(['header1', 'header2']);
-        self::assertEquals('header1', $this->sheet->getCell('A1')->getValue());
-        self::assertEquals('header2', $this->sheet->getCell('B1')->getValue());
+        $this->assertCellEquals('header1', 'A1');
+        $this->assertCellEquals('header2', 'B1');
 
-        $message = "The header row must be bold by default";
-        $coordinate = 'A1';
-        $this->assertCellBold($coordinate, $message);
+        $this->assertCellBold('A1', "The header row must be bold by default");
     }
 
     public function test_if_it_appends_a_row()
@@ -151,11 +149,10 @@ class XlserTest extends \PHPUnit_Framework_TestCase
 
     public function test_if_row_format_gets_applied()
     {
-        $cellFormat = new CellFormat();
         $rowFormat = new CellFormat();
         $rowFormat->setBold(true);
 
-        $this->man->insertVal(123, $cellFormat, $rowFormat);
+        $this->man->insertVal(123, null, $rowFormat);
 
         $this->assertCellBold('A1');
     }

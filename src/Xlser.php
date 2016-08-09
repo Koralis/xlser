@@ -4,7 +4,7 @@ namespace Sakalys\Xlser;
 
 use PHPExcel;
 use PHPExcel_Cell;
-use ReflectionObject;
+use PHPExcel_IOFactory;
 
 class Xlser extends PHPExcel
 {
@@ -43,10 +43,15 @@ class Xlser extends PHPExcel
 
     public function output($type)
     {
-        $writer = \PHPExcel_IOFactory::createWriter($this, 'Excel5');
+        $writer = PHPExcel_IOFactory::createWriter($this, 'Excel5');
 
         switch ($type) {
             case self::OUTPUT_MEMORY;
+
+                $highestCol = $this->getActiveSheet()->getHighestColumn();
+                foreach (range('A', $highestCol) as $col) {
+                    $this->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+                }
 
                 $file = tempnam(sys_get_temp_dir(), 'xlser');
                 $writer->save($file);
