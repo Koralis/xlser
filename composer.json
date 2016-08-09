@@ -1,5 +1,5 @@
 {
-  "name": "sakalys/xlser",
+  "name": "koralis/xlser",
   "description": "A wrapper that simplifies work with phpoffice/phpexcel library",
   "type": "library",
   "license": "MIT",
