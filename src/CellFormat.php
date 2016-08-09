@@ -39,6 +39,7 @@ class CellFormat
      */
     public static function currency($symbol, $precision = 2, $symbolAfterValue = false, $thousandSeparator = ',', $decimalSeparator = '.')
     {
+        // This line here
 //        $o = new self;
 //
 ////        $numberFormat = '"$"#,##0.00_-';
